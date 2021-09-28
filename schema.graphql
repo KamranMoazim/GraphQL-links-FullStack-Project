@@ -1,0 +1,112 @@
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    links: [Link!]!
+}
+type Link {
+    id: ID!
+    description: String!
+    url: String!
+    postedBy: User
+}
+type AuthPayload {
+    token: String
+    user: User
+}
+
+
+
+type Query {
+    # info: String!
+    feed: [Link!]!
+    # link(id: ID!): Link
+    # users: [User!]!
+    # user(id: ID!): User
+}
+
+type Mutation {
+    post(url: String!, description: String!): Link!
+    updatePost(id: ID!, url: String, description: String): Link
+    deletePost(id: ID!): ID
+    signup(email: String!, password: String!, name: String!): AuthPayload
+    login(email: String!, password: String!): AuthPayload
+    # createUser(name: String!): User!
+}
+
+type Subscription {
+  newLink: Link
+}
+
+
+# //////////////////////// ALL MUTATIONS ////////////////////////
+# mutation Mutation{
+#   signup(email: "123@123.123", password: "123", name: "123") {
+#     user {
+#       name
+#       email
+#     }
+#     token
+#   }
+# }
+
+# mutation LoginMutation{
+#   login(email: "123@123.123", password: "123") {
+#     token
+#     user {
+#       email
+#       name
+#     }
+#   }
+
+# mutation PostMutation{
+#   post(url: "googel.com", description: "Googele is amazing") {
+#     description
+#     url
+#     postedBy {
+#       email
+#       name
+#     }
+#   }
+# }
+
+# mutation UpdatePostMutation{
+#   updatePost(id: 15, url: "updated googel.com", description: "updated description") {
+#     description
+#     url
+#     postedBy {
+#       name
+#       email
+#     }
+#   }
+# }
+
+# mutation DeletePostMutation {
+#   deletePost(id: 16)
+# }
+
+
+# //////////////////////// ALL QUERIES ////////////////////////
+# query Query {
+#   feed {
+#     description
+#     url
+#     postedBy {
+#       name
+#       email
+#     }
+#   }
+# }
+
+# query Query {
+#   feed {
+#     description
+#     url
+#     postedBy {
+#       name
+#       email
+#       id
+#     }
+#   }
+# }
+

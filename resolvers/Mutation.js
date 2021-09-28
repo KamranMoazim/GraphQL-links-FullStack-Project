@@ -1,0 +1,117 @@
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const { APP_SECRET } = require('../utils')
+
+async function signup(parent, args, context, info) {
+    // 1
+    const password = await bcrypt.hash(args.password, 10)
+  
+    // 2
+    const user = await context.prisma.user.create({ data: { ...args, password } })
+  
+    // 3
+    const token = jwt.sign({ userId: user.id }, APP_SECRET)
+  
+    // 4
+    return {
+      token,
+      user,
+    }
+}
+  
+async function login(parent, args, context, info) {
+    // 1
+    const user = await context.prisma.user.findUnique({ where: { email: args.email } })
+    if (!user) {
+      throw new Error('No such user found')
+    }
+  
+    // 2
+    const valid = await bcrypt.compare(args.password, user.password)
+    if (!valid) {
+      throw new Error('Invalid password')
+    }
+  
+    const token = jwt.sign({ userId: user.id }, APP_SECRET)
+  
+    // 3
+    return {
+      token,
+      user,
+    }
+}
+  
+
+async function post(parent, args, context, info) {
+    const { userId } = context;
+  
+    return await context.prisma.link.create({
+      data: {
+        url: args.url,
+        description: args.description,
+        postedBy: { connect: { id: userId } },
+      }
+    })
+}
+
+
+// updateLink: async (parent, args, cntx)=>{
+//     console.log("UPDATE")
+//     const updateLink = await cntx.prisma.link.update({
+//         where: {
+//             id: parseInt(args.id)
+//         },
+//         data: {
+//             description: args.description,
+//             url: args.url
+//         },
+//     })
+//     // console.log(updateLink)
+//     return updateLink
+// },
+async function updatePost(parent, args, context, info) {
+    // const { userId } = context;
+  
+    return await context.prisma.link.update({
+        where: {
+            id: parseInt(args.id)
+        },
+        data: {
+            url: args.url,
+            description: args.description,
+            // postedBy: { connect: { id: userId } },
+        }
+    })
+}
+
+
+// deleteLink: async (parent, args, cntx)=>{
+//     const deletedLink = await cntx.prisma.link.delete({
+//         where: {
+//             id: parseInt(args.id)
+//         }
+//     })
+//     // console.log(deletedLink)
+//     return args.id
+// },
+async function deletePost(parent, args, context, info) {
+  
+    await context.prisma.link.delete({
+        where: {
+            id: parseInt(args.id)
+        }
+    })
+    return args.id
+}
+
+
+
+module.exports = {
+    signup,
+    login,
+    post,
+    updatePost,
+    deletePost
+}
+
+
