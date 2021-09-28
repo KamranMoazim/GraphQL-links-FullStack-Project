@@ -9,12 +9,17 @@ type Link {
     description: String!
     url: String!
     postedBy: User
+    votes: [Vote!]!
 }
 type AuthPayload {
     token: String
     user: User
 }
-
+type Vote {
+    id: ID!
+    link: Link!
+    user: User!
+}
 
 
 type Query {
@@ -31,12 +36,30 @@ type Mutation {
     deletePost(id: ID!): ID
     signup(email: String!, password: String!, name: String!): AuthPayload
     login(email: String!, password: String!): AuthPayload
+    vote(linkId: ID!): Vote
     # createUser(name: String!): User!
 }
 
 type Subscription {
   newLink: Link
+  deleteLink: ID
+  newVote: Vote
 }
+
+
+# //////////////////////// ALL SUBSCRIPTIONS ////////////////////////
+# subscription {
+#   newLink {
+#     id
+#     url
+#     description
+#     postedBy {
+#       id
+#       name
+#       email
+#     }
+#   }
+# }
 
 
 # //////////////////////// ALL MUTATIONS ////////////////////////
